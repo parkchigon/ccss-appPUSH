@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.lgu.ccss.apppush.mapper.AppPushMapperOracle">	
+	
+	<insert id="insertAppPushSendHistory" parameterType="com.lgu.ccss.apppush.model.AppPushVO">
+		INSERT 
+			INTO TB_APP_PUSH_QUEUE_HIS(
+				MSG_ID,
+				MSG_STATUS,
+				CODE,
+				MSG_TITLE,
+				MSG_CONT,
+				MSG_TYPE,
+				RECV_PHONE_NO,
+				SEND_TYPE,
+				SVR_ID,
+				ORG_NO,
+				CALLBACK_NO,
+				SEND_DT,
+				<!-- 2018.11.04 REG_DT 컬럼 삭제 (CVT)-->
+				<!-- REG_DT, -->
+				REG_ID,
+				UPD_DT,
+				UPD_ID,
+				REQ_PART,
+				PROCESS_DT,
+				DEVICE_TYPE,
+				SEND_TRY_CNT
+			) 
+		VALUES (
+			#{msgId, jdbcType=VARCHAR},
+			#{msgStatus, jdbcType=VARCHAR},
+			#{code, jdbcType=VARCHAR},
+			#{msgTitle, jdbcType=VARCHAR},
+			#{msgCont, jdbcType=VARCHAR},
+			#{msgType, jdbcType=VARCHAR},
+			#{recvPhoneNo, jdbcType=VARCHAR},
+			#{sendType, jdbcType=VARCHAR},
+			#{svrId, jdbcType=VARCHAR},
+			#{orgNo, jdbcType=VARCHAR},
+			#{callbackNo, jdbcType=VARCHAR},
+			TO_DATE(#{sendDt},'YYYYMMDDHH24MISS'),
+			<!-- SYSDATE, -->
+			#{regId, jdbcType=VARCHAR},
+			SYSDATE,
+			#{updId, jdbcType=VARCHAR},
+			#{reqPart, jdbcType=VARCHAR},
+			SYSDATE,
+			#{deviceType, jdbcType=VARCHAR},
+			#{sendTryCnt, jdbcType=INTEGER}
+		)
+	</insert>
+	
+	<!-- 닛산 LEAF 접속모델 조회 20190128 kangjin -->	
+	<select id="getConnDeviceModel" parameterType="String" resultType="String">
+		SELECT 
+			 CD.DEVICE_MODEL_ID
+		FROM 
+			 TB_MEMB MB
+			,TB_MGRAPP_DEVICE AD
+			,TB_MGRAPP_USER  AU
+			,TB_CONN_DEVICE   CD 
+		WHERE 1=1
+		AND MB.MEMB_ID = AD.MEMB_ID
+		AND AD.MGRAPP_ID = AU.MGRAPP_ID
+		AND MB.MEMB_ID = CD.MEMB_ID
+		AND MB.USE_YN = 'Y'
+		AND MB.USE_STATUS IN ('01','02')
+		AND AD.MAIN_USE_YN = 'Y'
+		AND AU.PUSH_ID = #{mgrAppLoginId,jdbcType=VARCHAR}	
+		AND ROWNUM = 1
+	</select>	
+	
+</mapper>
